@@ -1,33 +1,18 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using MQTTnet;
-using MQTTnet.Client;
 
-var mqttFactory = new MqttFactory();
+using MongoDB.Driver;
 
-using (var mqttClient = mqttFactory.CreateMqttClient())
+// PoC połączenia z MongoDB
+
+MongoClient dbClient = new MongoClient("mongodb://localhost:27017");
+
+var dbList = dbClient.ListDatabases().ToList();
+
+Console.WriteLine("The list of databases on this server is: ");
+foreach (var db in dbList)
 {
-	var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer("localhost", 1883).Build();
-
-	// Setup message handling before connecting so that queued messages
-	// are also handled properly. When there is no event handler attached all
-	// received messages get lost.
-	mqttClient.ApplicationMessageReceivedAsync += e =>
-	{
-		Console.WriteLine("Received application message.");
-
-		return Task.CompletedTask;
-	};
-
-	await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
-
-	var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-		.WithTopicFilter(f => f.WithTopic("sensors/temperature"))
-		.Build();
-
-	await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
-
-	Console.WriteLine("MQTT client subscribed to topic.");
-
-	Console.WriteLine("Press enter to exit.");
-	Console.ReadLine();
+	Console.WriteLine(db);
 }
+
+Console.WriteLine("Press enter to exit.");
+Console.ReadLine();
