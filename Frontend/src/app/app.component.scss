@@ -1,0 +1,22 @@
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  background-color: gray;
+  height: 100%;
+
+  header {
+    background-color: black;
+    margin-bottom: 2rem;
+    h1 {
+      color: white;
+      font-size: xx-large;
+      margin-left: 3rem;
+    }
+  }
+
+  body {
+    width: 80%;
+    margin: auto;
+    height: auto;
+  }
+}

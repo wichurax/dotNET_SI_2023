@@ -1,0 +1,60 @@
+<section class="top-section">
+  <span class="list-section" *ngFor="let group of sensorGroup; index as i">
+    <mat-checkbox
+                  class="margin"
+                  [checked]="allComplete[i]"
+                  [color]="group.color"
+                  [indeterminate]="someComplete(i)"
+                  (change)="setAll(i, $event)">
+      {{group.name}}
+    </mat-checkbox>
+    <ul>
+      <li *ngFor="let sensor of group.sensors">
+          <mat-checkbox [(ngModel)]="sensor.checked"
+                        [color]="sensor.color"
+                        (change)="updateAllComplete(i, sensor.name, $event)">
+            {{sensor.name}}
+          </mat-checkbox>
+        </li>
+    </ul>
+  </span>
+</section>
+
+<mat-card>
+  <mat-table [dataSource]="dataSource" matSort (matSortChange)="sortColumnChanged($event)">
+
+    <ng-container matColumnDef="Sensor Type">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Sensor Type </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.type}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="Sensor Name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Sensor Name </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="Value">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Value </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.value}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="Unit">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.unit}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="Timestamp">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Timestamp </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.timestamp | timeAgo }} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row mat-ripple *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+  </mat-table>
+  <mat-paginator
+    [length]="dataSize ?? 0"
+    [pageSize]="queryPageSize"
+    [showFirstLastButtons]="true">
+  </mat-paginator>
+</mat-card>
