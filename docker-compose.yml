@@ -1,0 +1,10 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./Frontend:/usr/src/app

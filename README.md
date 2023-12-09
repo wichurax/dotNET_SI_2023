@@ -3,6 +3,19 @@
 Poniżej znajduje się mała instrukcja jak postawić wszystkie niezbędne składniki, aby móc lokalnie symulować pracę systemu
 <br />
 
+## Uruchamianie
+Wszystkie komponenty docelowo umieszczone będą w osobnych kontenerach Dockera i porozumiewać się pomiędzy sobą poprzez sieć zdefiniowaną w pliku docker-compose.yml.
+
+Uruchamianie aplikacji:
+```bash
+docker-compose build
+docker-compose up
+```
+
+## Frontend
+Warsta prezentacji została zaimplementowana korzystając z framework'a Angular. Po uruchomieniu aplikacji widok dostępny jest pod http://localhost:4200/.
+
+
 ## MQTT
 Aby mieć możliwość wysyłania i odbierania wiadomości należy uruchomić HiveMQ na swoim lokalnym komputerze.
 Można zrobić to korzystacjąc z Dokera (rekomendowana opcja)
