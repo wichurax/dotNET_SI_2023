@@ -1,4 +1,5 @@
 ﻿using Backend.Dtos;
+using Backend.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -19,42 +20,13 @@ namespace Backend.Controllers
 			[FromQuery] FilterDto filter, 
 			[FromQuery] SortDto sort) 
 		{
-			// TODO MS
+			var db = new MongoDbService("mongodb://localhost:27017", "sensors");
 
-			var result = new List<SensorMeasurementDto>();
-
-			result.Add(new SensorMeasurementDto()
-			{
-				MeasurementDate = DateTime.Now,
-				SensorName = "XD",
-				SensorType = "temperature"
-			});
+			var result = db.GetRecentData(sort)
+				.Select(x => x.ToDto())
+				.ToList();
 
 			return Ok(result);
 		}
-	}
-
-	public class FilterDto
-	{
-		public DateTime? From { get; set; }
-		public DateTime? To { get; set; }
-		public List<string> SensorType { get; set; } = new();
-		public List<string> SensorName { get; set; } = new();
-	}
-
-	public class SortDto
-	{
-		/// <summary>
-		/// Name of column we want to sort data
-		/// </summary>
-		public string? ColumnName { get; set; }
-
-		public SortDirection Direction { get; set; } = SortDirection.Ascending;
-	}
-
-	public enum SortDirection
-	{
-		Ascending,
-		Descending
 	}
 }

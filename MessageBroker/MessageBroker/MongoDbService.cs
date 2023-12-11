@@ -2,36 +2,36 @@ namespace MessageBroker;
 
 using MongoDB.Driver;
 
-public class MongoDbService
+internal class MongoDbService
 {
-    private readonly IMongoCollection<SensorData> _sensorDataCollection;
+    private readonly IMongoCollection<SensorDataEntity> _sensorDataCollection;
 
     public MongoDbService(string connectionString, string databaseName)
     {
         var client = new MongoClient(connectionString);
         var database = client.GetDatabase(databaseName);
         database.CreateCollection("sensorsData");
-        _sensorDataCollection = database.GetCollection<SensorData>("sensorsData");
+        _sensorDataCollection = database.GetCollection<SensorDataEntity>("sensorsData");
     }
 
-    public void InsertSensorData(SensorData sensorData)
+    public void InsertSensorData(SensorDataEntity sensorData)
     {
         _sensorDataCollection.InsertOne(sensorData);
     }
 
     /* example functions for data retrieval */
-    public List<SensorData> GetDataBySensorType(string sensorType)
+    public List<SensorDataEntity> GetDataBySensorType(string sensorType)
     {
-        var filter = Builders<SensorData>.Filter.Eq(x => x.SensorType, sensorType);
+        var filter = Builders<SensorDataEntity>.Filter.Eq(x => x.SensorType, sensorType);
         return _sensorDataCollection.Find(filter).ToList();
     }
     
-    public List<SensorData> GetRecentData(int pageIndex, int pageSize)
+    public List<SensorDataEntity> GetRecentData(int pageIndex, int pageSize)
     {
-        var sortDefinition = Builders<SensorData>.Sort.Descending(x => x.MeasurementDate);
+        var sortDefinition = Builders<SensorDataEntity>.Sort.Descending(x => x.MeasurementDate);
         var skip = (pageIndex - 1) * pageSize;
 
-        return _sensorDataCollection.Find(FilterDefinition<SensorData>.Empty)
+        return _sensorDataCollection.Find(FilterDefinition<SensorDataEntity>.Empty)
             .Sort(sortDefinition)
             .Skip(skip)
             .Limit(pageSize)

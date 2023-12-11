@@ -1,6 +1,6 @@
 namespace SensorsFactory;
 
-public class SensorData
+internal class SensorData
 {
     public string SensorType { get; set; }
     public string SensorName { get; set; }

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace MessageBroker
 {
-	public class MessageBroker
+	internal class MessageBroker
 	{
 		private readonly MongoDbService _mongoDbService;
 		public MessageBroker(MongoDbService mongoDbService)
@@ -28,9 +28,11 @@ namespace MessageBroker
 				var payload = e.ApplicationMessage.ConvertPayloadToString();
 				try
 				{
-					var sensorData = JsonConvert.DeserializeObject<SensorData>(payload);
-					if (sensorData != null) _mongoDbService.InsertSensorData(sensorData);
-					Console.WriteLine($"Inserted data into MongoDB: {payload}");
+					var sensorData = JsonConvert.DeserializeObject<SensorData>(payload) ?? throw new Exception("object shoudn't be null");
+					var sensorDataEntity = sensorData.ToEntity();
+
+					if (sensorData != null) _mongoDbService.InsertSensorData(sensorDataEntity);
+					Console.WriteLine($"Inserted data into MongoDB: {JsonConvert.SerializeObject(sensorDataEntity)}");
 				}
 				catch (JsonException ex)
 				{
