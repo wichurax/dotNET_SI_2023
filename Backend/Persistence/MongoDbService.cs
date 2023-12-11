@@ -15,6 +15,11 @@ internal class MongoDbService
 		_sensorDataCollection = database.GetCollection<SensorDataEntity>("sensorsData");
 	}
 
+	public void InsertSensorData(SensorDataEntity sensorData)
+	{
+		_sensorDataCollection.InsertOne(sensorData);
+	}
+
 	public List<SensorDataEntity> GetSensorsData(FilterDto filterParams, SortDto sortParams) 
 		=> _sensorDataCollection
 			.AsQueryable()

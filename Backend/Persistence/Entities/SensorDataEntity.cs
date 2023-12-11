@@ -1,3 +1,4 @@
+using Backend.Broker;
 using MongoDB.Entities;
 
 namespace Backend.Persistence.Entities;
