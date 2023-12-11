@@ -2,10 +2,7 @@ namespace Backend.Persistence;
 
 using Backend.Dtos;
 using Backend.Persistence.Entities;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Entities;
-using System.Linq.Expressions;
 
 internal class MongoDbService
 {
@@ -31,10 +28,11 @@ internal class MongoDbService
 		return _sensorDataCollection.Find(filter).ToList();
 	}
 
-	public List<SensorDataEntity> GetRecentData(SortDto sortParams)
+	public List<SensorDataEntity> GetSensorsData(FilterDto filterParams, SortDto sortParams)
 	{
 		return _sensorDataCollection
-			.Find(new BsonDocument())
+			.AsQueryable()
+			.ApplyFilters(filterParams)
 			.ApplySort(sortParams)
 			.ToList();
 	}
@@ -42,46 +40,57 @@ internal class MongoDbService
 
 internal static class Extensions
 {
-	public static IFindFluent<SensorDataEntity, SensorDataEntity> ApplySort(
-		this IFindFluent<SensorDataEntity, SensorDataEntity> fluentFind,
-		SortDto sortParams)
+	public static IQueryable<SensorDataEntity> ApplyFilters(this IQueryable<SensorDataEntity> entities, FilterDto filterParams)
 	{
-		if (sortParams.ColumnName == null || sortParams.ColumnName == "")
-			return fluentFind;
+		if (filterParams.From != null)
+			entities = entities.Where(x => x.MeasurementDate > filterParams.From);
 
-		var sortDefinition2 = sortParams.Direction == Enums.SortDirection.Descending
-			? Builders<SensorDataEntity>.Sort.Descending(x => x.Value)
-			: Builders<SensorDataEntity>.Sort.Ascending(x => x.Value);
+		if (filterParams.To != null)
+			entities = entities.Where(x => x.MeasurementDate < filterParams.To);
 
-		var sortDefinition = sortParams.Direction == Enums.SortDirection.Descending
-			? SortDescendingBuilder(sortParams.ColumnName)
-			: SortAscendingBuilder(sortParams.ColumnName);
+		if (filterParams.SensorType.Count > 0)
+			entities = entities.Where(x => filterParams.SensorType.Contains(x.SensorType));
 
-		return fluentFind.Sort(sortDefinition);
+		if (filterParams.SensorName.Count > 0)
+			entities = entities.Where(x => filterParams.SensorName.Contains(x.SensorName));
+
+		return entities;
 	}
 
-	private static SortDefinition<SensorDataEntity> SortDescendingBuilder(string columnName)
+	public static IQueryable<SensorDataEntity> ApplySort(this IQueryable<SensorDataEntity> entities, SortDto sortParams)
+	{
+		if (sortParams.ColumnName == null || sortParams.ColumnName == "")
+			return entities;
+
+		entities = sortParams.Direction == Enums.SortDirection.Descending
+			? entities.SortDescendingBuilder(sortParams.ColumnName)
+			: entities.SortAscendingBuilder(sortParams.ColumnName);
+
+		return entities;
+	}
+
+	private static IQueryable<SensorDataEntity> SortDescendingBuilder(this IQueryable<SensorDataEntity> entities, string columnName)
 	{
 		return columnName switch
 		{
-			"SensorType" => Builders<SensorDataEntity>.Sort.Descending(x => x.SensorType),
-			"SensorName" => Builders<SensorDataEntity>.Sort.Descending(x => x.SensorName),
-			"Value" => Builders<SensorDataEntity>.Sort.Descending(x => x.Value),
-			"Unit" => Builders<SensorDataEntity>.Sort.Descending(x => x.Unit),
-			"MeasurementDate" => Builders<SensorDataEntity>.Sort.Descending(x => x.MeasurementDate),
+			"SensorType" => entities.OrderByDescending(x => x.SensorType),
+			"SensorName" => entities.OrderByDescending(x => x.SensorName),
+			"Value" => entities.OrderByDescending(x => x.Value),
+			"Unit" => entities.OrderByDescending(x => x.Unit),
+			"MeasurementDate" => entities.OrderByDescending(x => x.MeasurementDate),
 			_ => throw new ArgumentOutOfRangeException(nameof(columnName)),
 		};
 	}
 
-	private static SortDefinition<SensorDataEntity> SortAscendingBuilder(string columnName)
+	private static IQueryable<SensorDataEntity> SortAscendingBuilder(this IQueryable<SensorDataEntity> entities, string columnName)
 	{
 		return columnName switch
 		{
-			"SensorType" => Builders<SensorDataEntity>.Sort.Ascending(x => x.SensorType),
-			"SensorName" => Builders<SensorDataEntity>.Sort.Ascending(x => x.SensorName),
-			"Value" => Builders<SensorDataEntity>.Sort.Ascending(x => x.Value),
-			"Unit" => Builders<SensorDataEntity>.Sort.Ascending(x => x.Unit),
-			"MeasurementDate" => Builders<SensorDataEntity>.Sort.Ascending(x => x.MeasurementDate),
+			"SensorType" => entities.OrderBy(x => x.SensorType),
+			"SensorName" => entities.OrderBy(x => x.SensorName),
+			"Value" => entities.OrderBy(x => x.Value),
+			"Unit" => entities.OrderBy(x => x.Unit),
+			"MeasurementDate" => entities.OrderBy(x => x.MeasurementDate),
 			_ => throw new ArgumentOutOfRangeException(nameof(columnName)),
 		};
 	}

@@ -22,7 +22,7 @@ namespace Backend.Controllers
 		{
 			var db = new MongoDbService("mongodb://localhost:27017", "sensors");
 
-			var result = db.GetRecentData(sort)
+			var result = db.GetSensorsData(filter, sort)
 				.Select(x => x.ToDto())
 				.ToList();
 
