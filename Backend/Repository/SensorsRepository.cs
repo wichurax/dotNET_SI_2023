@@ -1,6 +1,18 @@
-﻿//namespace Backend.Repository;
+﻿using Backend.Dtos;
+using Backend.Persistence;
+using Backend.Persistence.Entities;
 
-//public class SensorsRepository
-//{
-//	private readonly 
-//}
+namespace Backend.Repository;
+
+internal class SensorsRepository : ISensorsRepository<SensorDataEntity>
+{
+	private readonly MongoDbService _persistance;
+
+	public SensorsRepository()
+	{
+		_persistance = new MongoDbService("mongodb://localhost:27017", "sensors");
+	}
+
+	public List<SensorDataEntity> Get(FilterDto filterParams, SortDto sortParams)
+		=> _persistance.GetSensorsData(filterParams, sortParams);
+}

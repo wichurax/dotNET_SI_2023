@@ -1,4 +1,9 @@
+using Backend.Persistence.Entities;
+using Backend.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<ISensorsRepository<SensorDataEntity>, SensorsRepository>();
 
 // Add services to the container.
 
