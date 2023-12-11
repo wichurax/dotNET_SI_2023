@@ -30,11 +30,11 @@ for (int j = 1; j < 5; j++) {
 	for (int i = 0; i < 5; i++)
 	{
 		var temperatureValue = TemperatureSensor.GenereteNextValue();
-		var data = new SensorData("Humidity", "H0" + j, temperatureValue, "%", DateTime.Today);
+		var data = new SensorData("Temperature", "T0" + j, temperatureValue, "Celsius", DateTimeOffset.Now);
 		var serializedData = JsonSerializer.Serialize(data);
 		
 		var message = new MqttApplicationMessageBuilder()
-			.WithTopic("sensors/humidity")
+			.WithTopic("sensors/temperature")
 			.WithPayload(serializedData)
 			.Build();
 

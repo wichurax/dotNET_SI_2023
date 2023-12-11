@@ -9,5 +9,5 @@ public class SensorDataEntity : Entity
 	public string SensorName { get; set; }
 	public double Value { get; set; }
 	public string Unit { get; set; }
-	public DateTime MeasurementDate { get; set; }
+	public DateTimeOffset MeasurementDate { get; set; }
 }

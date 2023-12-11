@@ -6,9 +6,9 @@
 		public string SensorName { get; }
 		public double Value { get; }
 		public string Unit { get; }
-		public DateTime MeasurementDate { get; }
+		public DateTimeOffset MeasurementDate { get; }
 
-		public SensorMeasurementDto(string sensorType, string sensorName, double value, string unit, DateTime measurementDate)
+		public SensorMeasurementDto(string sensorType, string sensorName, double value, string unit, DateTimeOffset measurementDate)
 		{
 			SensorType = sensorType;
 			SensorName = sensorName;

@@ -35,7 +35,7 @@ public class SensorsController : ControllerBase
 		var measurements = _repository.Get(filter, sort);
 		
 		var measurementsBytes = Encoding.ASCII.GetBytes(measurements.ToCsv());
-		var fileName = $"measurements_csv_{DateTime.UtcNow:o}.csv";
+		var fileName = $"measurements_csv_{DateTimeOffset.UtcNow:o}.csv";
 
 		return File(measurementsBytes, "text/csv", fileName);
 	}
