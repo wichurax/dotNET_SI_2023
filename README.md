@@ -11,6 +11,9 @@ Uruchamianie aplikacji:
 docker-compose build
 docker-compose up
 ```
+Na ten moment brakuje zapięcia API w kontener więc po powyższych komendach należy uruchomić program **MessageBroker**.
+
+Następnie można uruchomić skrypt z projektu Sensor1 i zaobserwować w logach pobieranie przez api danych z kolejki i składowanie ich w bazie.
 
 ## Frontend
 Warsta prezentacji została zaimplementowana korzystając z framework'a Angular. Po uruchomieniu aplikacji widok dostępny jest pod http://localhost:4200/.
@@ -18,27 +21,15 @@ Warsta prezentacji została zaimplementowana korzystając z framework'a Angular.
 
 ## MQTT
 Aby mieć możliwość wysyłania i odbierania wiadomości należy uruchomić HiveMQ na swoim lokalnym komputerze.
-Można zrobić to korzystacjąc z Dokera (rekomendowana opcja)
-
-Przykładowa komenda:
-```bash
-docker run --name hivemq -p 8080:8080 -p 1883:1883 hivemq/hivemq4
-```
-
-Więcej info na stronie https://www.hivemq.com/downloads/docker/ 
-<br />
+Po uruchomieniu aplikacji UI HiveMQ dostępne jest pod adresem: http://localhost:8080/.
 
 ## Baza danych
 Aby mieć możliwość zapisu danych do bazy danych należy uruchomić serwer MongoDB na swoim lokalnym komputerze.
-Można zrobić to korzystacjąc z Dokera (rekomendowana opcja)
+Do połączenia z uruchomioną w kontenerze korzystamy z paczki **MongoDB.Driver**. Przykład połączenia:
 
-Przykładowa komenda:
-```bash
-docker run --name mongodb -d -p 27017:27017 mongodb/mongodb-community-server:6.0-ubi8
+```csharp
+var service = new MongoDbService("mongodb://localhost:27017", "sensors");
 ```
-
-Więcej info na stronie https://www.mongodb.com/compatibility/docker
-<br />
 
 ## Symulowanie czujników
 TODO MS

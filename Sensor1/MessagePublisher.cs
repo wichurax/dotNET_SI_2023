@@ -10,11 +10,13 @@ namespace SensorsFactory
 
 			try
 			{
-				var actory = new MqttFactory();
+				var factory = new MqttFactory();
 
-				using (var client = actory.CreateMqttClient())
+				using (var client = factory.CreateMqttClient())
 				{
-					var options = new MqttClientOptionsBuilder().WithTcpServer("localhost", 1883).Build();
+					var options = new MqttClientOptionsBuilder()
+						.WithTcpServer("localhost", 1883)
+						.Build();
 
 					await client.ConnectAsync(options, CancellationToken.None);
 					await client.PublishAsync(message, CancellationToken.None);

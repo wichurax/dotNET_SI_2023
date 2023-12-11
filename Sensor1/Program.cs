@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Text.Json;
 using MQTTnet;
 using Sensor1;
 using SensorsFactory;
@@ -25,16 +26,18 @@ using SensorsFactory;
 
 var publisher = new MessagePublisher();
 
-for (int i = 0; i < 100; i++)
-{
-	var temperatureValue = TemperatureSensor.GenereteNextValue();
+for (int j = 1; j < 5; j++) {
+	for (int i = 0; i < 5; i++)
+	{
+		var temperatureValue = TemperatureSensor.GenereteNextValue();
+		var data = new SensorData("Temperature", "T0" + j, temperatureValue, "Celsius", DateTime.Today);
+		var serializedData = JsonSerializer.Serialize(data);
+		
+		var message = new MqttApplicationMessageBuilder()
+			.WithTopic("sensors/temperature")
+			.WithPayload(serializedData)
+			.Build();
 
-	Console.WriteLine(temperatureValue);
-
-	var message = new MqttApplicationMessageBuilder()
-		.WithTopic("sensors/temperature")
-		.WithPayload(temperatureValue.ToString())
-		.Build();
-
-	await publisher.Publish(message);
+		await publisher.Publish(message);
+	}
 }
