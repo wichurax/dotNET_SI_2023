@@ -35,7 +35,7 @@ export class Client {
      * @param direction (optional) 
      * @return Success
      */
-    sensors(from: Date | undefined, to: Date | undefined, sensorType: string | undefined, sensorName: string | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
+    sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
         let url_ = this.baseUrl + "/api/sensors?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
@@ -48,11 +48,11 @@ export class Client {
         if (sensorType === null)
             throw new Error("The parameter 'sensorType' cannot be null.");
         else if (sensorType !== undefined)
-            url_ += "SensorType=" + encodeURIComponent("" + sensorType) + "&";
+            sensorType && sensorType.forEach(item => { url_ += "SensorType=" + encodeURIComponent("" + item) + "&"; });
         if (sensorName === null)
             throw new Error("The parameter 'sensorName' cannot be null.");
         else if (sensorName !== undefined)
-            url_ += "SensorName=" + encodeURIComponent("" + sensorName) + "&";
+            sensorName && sensorName.forEach(item => { url_ += "SensorName=" + encodeURIComponent("" + item) + "&"; });
         if (columnName === null)
             throw new Error("The parameter 'columnName' cannot be null.");
         else if (columnName !== undefined)

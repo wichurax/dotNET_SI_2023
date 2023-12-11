@@ -38,8 +38,8 @@ namespace Backend.Controllers
 	{
 		public DateTime? From { get; set; }
 		public DateTime? To { get; set; }
-		public string? SensorType { get; set; }
-		public string? SensorName { get; set; }
+		public List<string> SensorType { get; set; } = new();
+		public List<string> SensorName { get; set; } = new();
 	}
 
 	public class SortDto
