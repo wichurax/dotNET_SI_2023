@@ -25,27 +25,22 @@
 
     <ng-container matColumnDef="Sensor Type">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Sensor Type </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.type}} </mat-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.sensorType}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="Sensor Name">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Sensor Name </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.name}} </mat-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.sensorName}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="Value">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Value </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.value}} </mat-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.value + measurement.unit}} </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="Unit">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.unit}} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="Timestamp">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> Timestamp </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.timestamp | timeAgo }} </mat-cell>
+    <ng-container matColumnDef="Date">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Date </mat-header-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.measurementDate | date }} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

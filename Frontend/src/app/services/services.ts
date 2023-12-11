@@ -10,33 +10,33 @@
 
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
-import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
-export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class Client {
+    private readonly API_BASE_URL = 'http://localhost:5207';
     private http: HttpClient;
-    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    constructor(@Inject(HttpClient) http: HttpClient) {
+      this.http = http;
     }
 
     /**
-     * @param from (optional) 
-     * @param to (optional) 
-     * @param sensorType (optional) 
-     * @param sensorName (optional) 
-     * @param columnName (optional) 
-     * @param direction (optional) 
+     * @param from (optional)
+     * @param to (optional)
+     * @param sensorType (optional)
+     * @param sensorName (optional)
+     * @param columnName (optional)
+     * @param direction (optional)
      * @return Success
      */
     sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
-        let url_ = this.baseUrl + "/api/sensors?";
+        let url_ = this.API_BASE_URL + "/api/sensors?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)
@@ -118,7 +118,7 @@ export class Client {
      * @return Success
      */
     getWeatherForecast(): Observable<WeatherForecast[]> {
-        let url_ = this.baseUrl + "/WeatherForecast";
+        let url_ = this.API_BASE_URL + "/WeatherForecast";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

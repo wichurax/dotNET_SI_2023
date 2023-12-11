@@ -11,15 +11,14 @@ import {MatRippleModule} from "@angular/material/core";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatCardModule} from "@angular/material/card";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import { TimeAgoPipe } from './pipes/time-ago.pipe';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {FormsModule} from "@angular/forms";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
     AppComponent,
     TableComponent,
-    TimeAgoPipe
   ],
   imports: [
     BrowserModule,
@@ -32,7 +31,8 @@ import {FormsModule} from "@angular/forms";
     MatCardModule,
     BrowserAnimationsModule,
     MatCheckboxModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

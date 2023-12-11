@@ -22,7 +22,7 @@ export class ApiService {
         name: name + this.getRandomInteger(1, 4),
         value: this.getRandomFloat(17.0, 22.0),
         unit: unit,
-        timestamp: new Date()
+        date: new Date()
       };
 
       result.push(temperatureEntry);

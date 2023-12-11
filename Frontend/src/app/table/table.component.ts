@@ -3,9 +3,10 @@ import {ApiService} from "../services/api.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort, Sort} from "@angular/material/sort";
 import {MatPaginator} from "@angular/material/paginator";
-import {Measurement} from "../models/measurement";
 import {SensorGroupCheckBox} from "../models/checkboxes";
 import {MatCheckboxChange} from "@angular/material/checkbox";
+import {FilterRequest, SortRequest} from "../models/requests";
+import {Client, SensorMeasurementDto, SortDirection} from "../services/services";
 
 @Component({
   selector: 'app-table',
@@ -16,8 +17,8 @@ export class TableComponent implements AfterViewInit {
 
   queryPageSize = 10;
   dataSize?: number;
-  dataSource = new MatTableDataSource<Measurement>();
-  displayedColumns = ['Sensor Type', 'Sensor Name' , 'Value', 'Unit', 'Timestamp'];
+  dataSource = new MatTableDataSource<SensorMeasurementDto>();
+  displayedColumns = ['Sensor Type', 'Sensor Name' , 'Value', 'Date'];
 
   @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort;
@@ -46,8 +47,20 @@ export class TableComponent implements AfterViewInit {
       ],
     }];
 
+  private sortRequest: SortRequest = {
+    columnName: "Date",
+    direction: SortDirection._0
+  }
+  private filterRequest: FilterRequest = {
+    from: undefined,
+    to: undefined,
+    sensorType: this.getCheckedSensorTypes(),
+    sensorName: this.getCheckedSensorNames()
+  }
+
   constructor (
-    private readonly apiService: ApiService
+    private readonly apiService: ApiService,
+    private readonly client: Client
   ) {  }
 
   allComplete: boolean[] = [true, true];
@@ -58,7 +71,8 @@ export class TableComponent implements AfterViewInit {
         s.checked = $event.checked;
     })
     this.allComplete[i] = this.sensorGroup[i].sensors != null && this.sensorGroup[i].sensors.every(t => t.checked);
-    this.filterData();
+    this.filterRequest.sensorName = this.getCheckedSensorNames();
+    this.loadData();
   }
 
   someComplete(i: number): boolean {
@@ -75,51 +89,37 @@ export class TableComponent implements AfterViewInit {
     }
     this.sensorGroup[i].checked = $event.checked;
     this.sensorGroup[i].sensors.forEach(t => (t.checked = $event.checked));
-    this.filterData();
+    this.filterRequest.sensorType = this.getCheckedSensorTypes();
+    this.loadData();
   }
 
   ngAfterViewInit(): void {
-    this.apiService.getTemperature(20)
-      .subscribe(data => {
-        this.dataSource.data = data;
-        this.dataSource.sort = this.sort!;
-        this.dataSource.paginator = this.paginator!;
-      });
-    this.apiService.getPressure(20)
-      .subscribe(data => {
-        this.dataSource.data.push(...data);
-        this.dataSize = this.dataSource.data.length;
-      });
-    this.dataSource.filterPredicate = (data, filter) => filter.split(',').includes(data.name);
-    this.filterData();
-  }
-
-  private filterData() {
-    const checked = this.sensorGroup.map(group =>
-      group.sensors.filter(s => s.checked).map(s => s.name) ?? []
-    )
-    const merged = checked.reduce((acc, curr) => acc.concat(curr), []);
-    this.dataSource.filter = merged.join(',');
+    this.loadData();
   }
 
   sortColumnChanged($event: Sort) {
-    const dir = $event.direction == 'asc' ? 1 : -1
-    switch ($event.active) {
-      case 'Sensor Type':
-        this.dataSource.filteredData.sort((a, b) => a.type.localeCompare(b.type) * dir);
-        break;
-      case 'Sensor Name':
-        this.dataSource.filteredData.sort((a, b) => a.name.localeCompare(b.name) * dir);
-        break;
-      case 'Value':
-        this.dataSource.filteredData.sort((a, b) => (a.value < b.value ? -1 : 1) * dir);
-        break;
-      case 'Unit':
-        this.dataSource.filteredData.sort((a, b) => a.unit.localeCompare(b.unit) * dir);
-        break;
-      default:
-        this.dataSource.filteredData.sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1) * dir);
-        break;
-    }
+    this.sortRequest = {columnName: $event.active, direction: $event.direction == "asc" ? SortDirection._0 : SortDirection._1}
+    this.loadData()
+  }
+
+  private loadData() {
+    return this.client.sensors(
+      this.filterRequest.from, this.filterRequest.to, this.filterRequest.sensorType,
+      this.filterRequest.sensorName, this.sortRequest.columnName, this.sortRequest.direction)
+      .subscribe(data => {
+        this.dataSource.data = data;
+        this.dataSize = data.length;
+      })
+  }
+
+  private getCheckedSensorTypes() {
+    return this.sensorGroup.filter(g => g.checked).map(t => t.name);
+  }
+
+  private getCheckedSensorNames() {
+    const checked = this.sensorGroup.map(group =>
+      group.sensors.filter(s => s.checked).map(s => s.name) ?? []
+    )
+    return checked.reduce((acc, curr) => acc.concat(curr), []);
   }
 }
