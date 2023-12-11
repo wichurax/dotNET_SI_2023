@@ -1,5 +1,4 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {ApiService} from "../services/api.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort, Sort} from "@angular/material/sort";
 import {MatPaginator} from "@angular/material/paginator";
@@ -59,7 +58,6 @@ export class TableComponent implements AfterViewInit {
   }
 
   constructor (
-    private readonly apiService: ApiService,
     private readonly client: Client
   ) {  }
 
