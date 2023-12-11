@@ -1,5 +1,4 @@
 ﻿using Backend.Dtos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -16,20 +15,31 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult<SensorMeasurementDto> GetSensorMeasurement(FilterDto filter, SortDto sort) 
+		public ActionResult<List<SensorMeasurementDto>> GetSensorMeasurement(
+			[FromQuery] FilterDto filter, 
+			[FromQuery] SortDto sort) 
 		{
 			// TODO MS
 
-			return new Ok();
+			var result = new List<SensorMeasurementDto>();
+
+			result.Add(new SensorMeasurementDto()
+			{
+				MeasurementDate = DateTime.Now,
+				SensorName = "XD",
+				SensorType = "temperature"
+			});
+
+			return Ok(result);
 		}
 	}
 
 	public class FilterDto
 	{
-		public DateTimeOffset? From { get; set; }
-		public DateTimeOffset? To { get; set; }
-		public string SensorType { get; set; }
-		public string SensorName { get; set; }
+		public DateTime? From { get; set; }
+		public DateTime? To { get; set; }
+		public string? SensorType { get; set; }
+		public string? SensorName { get; set; }
 	}
 
 	public class SortDto
