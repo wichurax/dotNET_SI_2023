@@ -7,6 +7,7 @@ import {MatCheckboxChange} from "@angular/material/checkbox";
 import {FilterRequest, SortRequest} from "../models/requests";
 import {Client, SensorMeasurementDto, SortDirection} from "../services/services";
 import {FormControl, FormGroup} from "@angular/forms";
+import {formatDate} from "@angular/common";
 
 @Component({
   selector: 'app-table',
@@ -19,6 +20,14 @@ export class TableComponent implements AfterViewInit {
   dataSize?: number;
   dataSource = new MatTableDataSource<SensorMeasurementDto>();
   displayedColumns = ['SensorType', 'SensorName' , 'Value', 'MeasurementDate'];
+
+  lineChartData: Array<{data: number[], label: string}> = [];
+  lineChartLabels: Array<string> = [];
+  lineChartOptions: any = {
+    responsive: true,
+  };
+  lineChartLegend = true;
+  lineChartType: 'line' = 'line';
 
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
@@ -46,6 +55,8 @@ export class TableComponent implements AfterViewInit {
       ],
     }];
 
+  allComplete: boolean[] = [true, true];
+
   dateRange = new FormGroup({
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
@@ -55,6 +66,7 @@ export class TableComponent implements AfterViewInit {
     columnName: "MeasurementDate",
     direction: SortDirection._0
   }
+
   private filterRequest: FilterRequest = {
     from: undefined,
     to: undefined,
@@ -66,11 +78,31 @@ export class TableComponent implements AfterViewInit {
     private readonly client: Client
   ) {  }
 
-  allComplete: boolean[] = [true, true];
-
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator!;
     this.loadData();
+  }
+
+  private getDaysArray() {
+    const dates: number[] = this.dataSource.data.map(m => m.measurementDate!.getTime());
+    const start = Math.min(...dates);
+    const end = Math.max(...dates);
+    for(var arr=[],dt=new Date(start); dt<=new Date(end); dt.setDate(dt.getDate()+1)) {
+      arr.push(new Date(dt));
+    }
+    return arr;
+  }
+
+  private refreshChart() {
+    const sensorNames = this.getCheckedSensorNames();
+    this.lineChartLabels = this.getDaysArray().map(d => formatDate(d, 'shortDate', 'en'));
+    this.lineChartData = [];
+    sensorNames.forEach(name => {
+      let measurementData = {data: Array<number>(), label: name};
+      this.dataSource.data.filter(m => m.sensorName == name)
+        .forEach(m => measurementData.data.push(m.value!))
+      this.lineChartData.push(measurementData);
+    })
   }
 
   updateAllComplete(i: number, name: string, $event: MatCheckboxChange) {
@@ -79,6 +111,7 @@ export class TableComponent implements AfterViewInit {
         s.checked = $event.checked;
     })
     this.allComplete[i] = this.sensorGroup[i].sensors != null && this.sensorGroup[i].sensors.every(t => t.checked);
+    this.filterRequest.sensorType = this.getCheckedSensorTypes();
     this.filterRequest.sensorName = this.getCheckedSensorNames();
     this.loadData();
   }
@@ -98,6 +131,7 @@ export class TableComponent implements AfterViewInit {
     this.sensorGroup[i].checked = $event.checked;
     this.sensorGroup[i].sensors.forEach(t => (t.checked = $event.checked));
     this.filterRequest.sensorType = this.getCheckedSensorTypes();
+    this.filterRequest.sensorName = this.getCheckedSensorNames();
     this.loadData();
   }
 
@@ -130,6 +164,7 @@ export class TableComponent implements AfterViewInit {
       .subscribe(data => {
         this.dataSource.data = data;
         this.dataSize = data.length;
+        this.refreshChart();
       })
   }
 }
