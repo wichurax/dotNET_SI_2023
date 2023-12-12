@@ -21,8 +21,8 @@ namespace SensorsFactory
 					await client.ConnectAsync(options, CancellationToken.None);
 					await client.PublishAsync(message, CancellationToken.None);
 					await client.DisconnectAsync();
-
-					Console.WriteLine("MQTT application message is published.");
+					string messageToPrint = message.ConvertPayloadToString();
+					Console.WriteLine("MQTT message is published:" + messageToPrint);
 				}
 			}
 			catch (Exception e)
