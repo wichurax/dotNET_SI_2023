@@ -18,7 +18,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
   providedIn: 'root'
 })
 export class Client {
-    private readonly API_BASE_URL = 'http://localhost:5207';
+    private readonly API_BASE_URL = 'http://localhost:5207/api/sensors';
     private http: HttpClient;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
@@ -36,7 +36,7 @@ export class Client {
      * @return Success
      */
     sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
-        let url_ = this.API_BASE_URL + "/api/sensors?";
+        let url_ = this.API_BASE_URL + "/measurements?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)

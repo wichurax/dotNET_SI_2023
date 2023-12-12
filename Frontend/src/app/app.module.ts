@@ -17,6 +17,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {NgChartsModule} from "ng2-charts";
+import {MatButtonModule} from "@angular/material/button";
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import {NgChartsModule} from "ng2-charts";
     MatDatepickerModule,
     ReactiveFormsModule,
     MatNativeDateModule,
-    NgChartsModule
+    NgChartsModule,
+    MatButtonModule
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
   bootstrap: [AppComponent]

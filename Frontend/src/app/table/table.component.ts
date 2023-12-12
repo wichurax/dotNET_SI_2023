@@ -146,6 +146,10 @@ export class TableComponent implements AfterViewInit {
     this.loadData();
   }
 
+  downloadCSV() {
+    // TODO AD: send request on /api/sensors/measurements-csv
+  }
+
   private getCheckedSensorTypes() {
     return this.sensorGroup.filter(g => g.checked).map(t => t.name);
   }
