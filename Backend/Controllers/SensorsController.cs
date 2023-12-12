@@ -1,32 +1,42 @@
 ﻿using Backend.Dtos;
-using Backend.Persistence;
+using Backend.Persistence.Entities;
+using Backend.Repository;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack;
+using System.Text;
 
-namespace Backend.Controllers
+namespace Backend.Controllers;
+
+[Route("api/sensors")]
+[ApiController]
+public class SensorsController : ControllerBase
 {
-	[Route("api/sensors")]
-	[ApiController]
-	public class SensorsController : ControllerBase
+	private readonly ISensorsRepository<SensorDataEntity> _repository;
+
+	public SensorsController(ISensorsRepository<SensorDataEntity> repository)
 	{
-		private readonly ILogger<SensorsController> _logger;
+		_repository = repository;
+	}
 
-		public SensorsController(ILogger<SensorsController> logger)
-		{
-			_logger = logger;
-		}
+	[HttpGet("measurements")]
+	public ActionResult<List<SensorMeasurementDto>> GetMeasurements([FromQuery] FilterDto filter, [FromQuery] SortDto sort)
+	{
+		var result = _repository
+			.Get(filter, sort)
+			.Select(x => x.ToDto())
+			.ToList();
 
-		[HttpGet]
-		public ActionResult<List<SensorMeasurementDto>> GetSensorMeasurement(
-			[FromQuery] FilterDto filter, 
-			[FromQuery] SortDto sort) 
-		{
-			var db = new MongoDbService("mongodb://localhost:27017", "sensors");
+		return Ok(result);
+	}
 
-			var result = db.GetSensorsData(filter, sort)
-				.Select(x => x.ToDto())
-				.ToList();
+	[HttpGet("measurements-csv")]
+	public ActionResult GetMeasurementsCsv([FromQuery] FilterDto filter, [FromQuery] SortDto sort)
+	{
+		var measurements = _repository.Get(filter, sort);
+		
+		var measurementsBytes = Encoding.ASCII.GetBytes(measurements.ToCsv());
+		var fileName = $"measurements_csv_{DateTimeOffset.UtcNow:o}.csv";
 
-			return Ok(result);
-		}
+		return File(measurementsBytes, "text/csv", fileName);
 	}
 }

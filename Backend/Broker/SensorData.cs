@@ -1,8 +1,8 @@
-﻿using MongoDB.Entities;
+using Backend.Persistence.Entities;
 
-namespace MessageBroker;
+namespace Backend.Broker;
 
-internal class SensorDataEntity : Entity
+internal class SensorData
 {
 	public string SensorType { get; set; }
 	public string SensorName { get; set; }
@@ -11,7 +11,7 @@ internal class SensorDataEntity : Entity
 	public DateTime MeasurementDate { get; set; }
 }
 
-internal static class Extensions
+internal static class SensorDataExtensions
 {
 	public static SensorDataEntity ToEntity(this SensorData data) =>
 		new()

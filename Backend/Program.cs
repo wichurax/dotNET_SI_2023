@@ -1,4 +1,31 @@
+using Backend.Broker;
+using Backend.Persistence;
+using Backend.Persistence.Entities;
+using Backend.Repository;
+
+await Task.Factory.StartNew(async () =>
+{
+	var service = new MongoDbService("mongodb://localhost:27017", "sensors");
+	var messageBroker = new MessageBroker(service);
+
+	Console.WriteLine("Starting MessageBroker...");
+
+	var topics = new List<string>
+	{
+		"sensors/temperature",
+		"sensors/humidity",
+		"sensors/pressure",
+		"sensors/wind_speed"
+	};
+
+	await messageBroker.SubscribeToTopics(topics);
+
+	Console.WriteLine("MessageBroker finished it's work");
+});
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<ISensorsRepository<SensorDataEntity>, SensorsRepository>();
 
 // Add services to the container.
 
