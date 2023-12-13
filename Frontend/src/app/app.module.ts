@@ -4,26 +4,27 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
-import {MatTableModule} from "@angular/material/table";
-import {MatSortModule} from "@angular/material/sort";
-import {CdkFixedSizeVirtualScroll} from "@angular/cdk/scrolling";
-import {MAT_DATE_LOCALE, MatNativeDateModule, MatRippleModule} from "@angular/material/core";
-import {MatPaginatorModule} from "@angular/material/paginator";
-import {MatCardModule} from "@angular/material/card";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {MatCheckboxModule} from "@angular/material/checkbox";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpClientModule} from "@angular/common/http";
-import {MatFormFieldModule} from "@angular/material/form-field";
-import {MatDatepickerModule} from "@angular/material/datepicker";
-import {NgChartsModule} from "ng2-charts";
-import {MatButtonModule} from "@angular/material/button";
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { CdkFixedSizeVirtualScroll } from '@angular/cdk/scrolling';
+import {
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  MatRippleModule,
+} from '@angular/material/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { NgChartsModule } from 'ng2-charts';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    TableComponent,
-  ],
+  declarations: [AppComponent, TableComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -42,9 +43,9 @@ import {MatButtonModule} from "@angular/material/button";
     ReactiveFormsModule,
     MatNativeDateModule,
     NgChartsModule,
-    MatButtonModule
+    MatButtonModule,
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
-  bootstrap: [AppComponent]
+  providers: [HttpClient, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

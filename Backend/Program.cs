@@ -5,8 +5,9 @@ using Backend.Repository;
 
 await Task.Factory.StartNew(async () =>
 {
-	// var service = new MongoDbService("mongodb://host.docker.internal:27017", "sensors");
-	var service = new MongoDbService("mongodb://localhost:27017", "sensors");
+	// TODO MS
+	//var service = new MongoDbService("mongodb://localhost:27017", "sensors");
+	var service = new MongoDbService("mongodb://host.docker.internal:27017", "sensors");
 	var messageBroker = new MessageBroker(service);
 
 	Console.WriteLine("Starting MessageBroker...");

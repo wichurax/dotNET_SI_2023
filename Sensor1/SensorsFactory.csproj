@@ -15,4 +15,10 @@
     <None Include="bin\Debug\net6.0\sensors-config.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="sensors-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

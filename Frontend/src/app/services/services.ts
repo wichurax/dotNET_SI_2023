@@ -10,32 +10,32 @@
 
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
-import { Injectable, Inject, Optional } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
-@Injectable({
-  providedIn: "root"
-})
+@Injectable()
 export class Client {
     private http: HttpClient;
-    private baseUrl = "http://localhost:5207";
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient) {
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
     /**
-     * @param from (optional)
-     * @param to (optional)
-     * @param sensorType (optional)
-     * @param sensorName (optional)
-     * @param columnName (optional)
-     * @param direction (optional)
+     * @param from (optional) 
+     * @param to (optional) 
+     * @param sensorType (optional) 
+     * @param sensorName (optional) 
+     * @param columnName (optional) 
+     * @param direction (optional) 
      * @return Success
      */
-    sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
+    measurements(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
         let url_ = this.baseUrl + "/api/sensors/measurements?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
@@ -115,15 +115,15 @@ export class Client {
     }
 
     /**
-     * @param from (optional)
-     * @param to (optional)
-     * @param sensorType (optional)
-     * @param sensorName (optional)
-     * @param columnName (optional)
-     * @param direction (optional)
+     * @param from (optional) 
+     * @param to (optional) 
+     * @param sensorType (optional) 
+     * @param sensorName (optional) 
+     * @param columnName (optional) 
+     * @param direction (optional) 
      * @return Success
      */
-    measurementsCsv(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<void> {
+    measurementsCsv(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<FileResponse> {
         let url_ = this.baseUrl + "/api/sensors/measurements-csv?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
@@ -155,6 +155,7 @@ export class Client {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -165,24 +166,31 @@ export class Client {
                 try {
                     return this.processMeasurementsCsv(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<FileResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<FileResponse>;
         }));
     }
 
-    protected processMeasurementsCsv(response: HttpResponseBase): Observable<void> {
+    protected processMeasurementsCsv(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (response as any).error instanceof Blob ? (response as any).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -247,6 +255,13 @@ export interface ISensorMeasurementDto {
 export enum SortDirection {
     _0 = 0,
     _1 = 1,
+}
+
+export interface FileResponse {
+    data: Blob;
+    status: number;
+    fileName?: string;
+    headers?: { [name: string]: any };
 }
 
 export class ApiException extends Error {

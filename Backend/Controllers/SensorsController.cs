@@ -30,7 +30,9 @@ public class SensorsController : ControllerBase
 	}
 
 	[HttpGet("measurements-csv")]
-	public ActionResult GetMeasurementsCsv([FromQuery] FilterDto filter, [FromQuery] SortDto sort)
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(FileContentResult), 200)]
+	public IActionResult GetMeasurementsCsv([FromQuery] FilterDto filter, [FromQuery] SortDto sort)
 	{
 		var measurements = _repository.Get(filter, sort);
 		
