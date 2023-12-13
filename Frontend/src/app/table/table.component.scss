@@ -4,13 +4,26 @@
   margin: 12px 0;
 }
 
-.list-section {
-  margin-top: auto;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-field {
+  margin-bottom: 10px; /* Adjust as needed for spacing */
+}
+
+.span-container {
+  display: flex;
+}
+
+.span {
+  margin-right: 10px; /* Adjust as needed for spacing */
 }
 
 mat-form-field {
   margin-top: auto;
-  margin-left: auto;
   height: 80px;
 }
 

@@ -1,32 +1,36 @@
 <section class="top-section">
-  <span class="list-section" *ngFor="let group of sensorGroup; index as i">
-    <mat-checkbox
-                  class="margin"
-                  [checked]="allComplete[i]"
-                  [color]="group.color"
-                  [indeterminate]="someComplete(i)"
-                  (change)="setAll(i, $event)">
-      {{group.name}}
-    </mat-checkbox>
-    <ul>
-      <li *ngFor="let sensor of group.sensors">
-          <mat-checkbox [(ngModel)]="sensor.checked"
-                        [color]="sensor.color"
-                        (change)="updateAllComplete(i, sensor.name, $event)">
-            {{sensor.name}}
-          </mat-checkbox>
-        </li>
-    </ul>
-  </span>
-  <mat-form-field>
-    <mat-label>Enter a date range</mat-label>
-    <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
-      <input matStartDate formControlName="start" placeholder="Start date" (dateChange)="dateChanged()">
-      <input matEndDate formControlName="end" placeholder="End date" (dateChange)="dateChanged()">
-    </mat-date-range-input>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker></mat-date-range-picker>
-  </mat-form-field>
+  <div class="container">
+    <mat-form-field class="form-field">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Start date" (dateChange)="dateChanged()">
+        <input matEndDate formControlName="end" placeholder="End date" (dateChange)="dateChanged()">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+    <div class="span-container">
+      <span class="span" *ngFor="let group of sensorGroup; index as i">
+        <mat-checkbox
+                      class="margin"
+                      [checked]="allComplete[i]"
+                      [color]="group.color"
+                      [indeterminate]="someComplete(i)"
+                      (change)="setAll(i, $event)">
+          {{group.name}}
+        </mat-checkbox>
+        <ul>
+          <li *ngFor="let sensor of group.sensors">
+              <mat-checkbox [(ngModel)]="sensor.checked"
+                            [color]="sensor.color"
+                            (change)="updateAllComplete(i, sensor.name, $event)">
+                {{sensor.name}}
+              </mat-checkbox>
+            </li>
+        </ul>
+      </span>
+    </div>
+  </div>
   <div class="chart">
     <canvas baseChart
             [datasets]="lineChartData"

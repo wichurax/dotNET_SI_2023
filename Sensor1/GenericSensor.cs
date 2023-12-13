@@ -20,7 +20,7 @@ namespace GenericSensorNamespace
     	{
 			_configuration = SensorsConfigurationService.Get();
 			SensorType = sensorType;
-			SensorName = "Sensor" + id++;
+			SensorName = sensorType[0].ToString().ToUpper() + id++;
 			Unit = _configuration.SensorsList.Where(sensor => sensor.Type == sensorType).Select(sensor => sensor.Unit).FirstOrDefault();
 			Unit ??= "C";
 			MinValue = _configuration.SensorsList.Where(sensor => sensor.Type == sensorType).Select(sensor => sensor.MinValue).FirstOrDefault();

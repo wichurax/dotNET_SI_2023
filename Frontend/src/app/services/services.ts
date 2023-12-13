@@ -10,20 +10,20 @@
 
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
-import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
+import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
-export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class Client {
     private http: HttpClient;
-    private baseUrl: string;
+    private baseUrl = "http://localhost:5207";
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient) {
         this.http = http;
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
     /**
@@ -36,7 +36,7 @@ export class Client {
      * @return Success
      */
     sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
-        let url_ = this.baseUrl + "/api/sensors?";
+        let url_ = this.baseUrl + "/api/sensors/measurements?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)

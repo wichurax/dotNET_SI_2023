@@ -8,16 +8,19 @@ public class Program
 {
 	static MessagePublisher publisher = new MessagePublisher();
 	static SensorsConfiguration _configuration = null!;
+	static DateTime _startDate = new DateTime(2023, 12, 1);
+	static DateTime _endDate = new DateTime(2023, 12, 13);
+	
     static async Task Main()
     {
 		Random rand = new Random();
 		List<GenericSensor> sensors = new List<GenericSensor>();
 		_configuration = SensorsConfigurationService.Get();
 
-		int temperatureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "temperature").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
-		int pressureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "pressure").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
-		int co2SensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "CO2").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
-		int humiditySensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "humidity").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
+		int temperatureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "temperature").Select(sensor => sensor.InstancesAmount).FirstOrDefault();
+		int pressureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "pressure").Select(sensor => sensor.InstancesAmount).FirstOrDefault();
+		int co2SensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "CO2").Select(sensor => sensor.InstancesAmount).FirstOrDefault();
+		int humiditySensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "humidity").Select(sensor => sensor.InstancesAmount).FirstOrDefault();
 
 		for(int i = 0; i < temperatureSensorsAmount; i++){
 			GenericSensor newSensor = new("temperature");
@@ -48,11 +51,12 @@ public class Program
 
     static async Task SendDataAsync(GenericSensor sensor)
     {
-		while(true){
+	    for (DateTime date = _startDate; date <= _endDate; date = date.AddDays(1))
+	    {
 			Double value = sensor.GenereteNextValue();
 			String sensorType = sensor.SensorType;
 
-			var data = new SensorData(sensorType, sensor.SensorName, value, sensor.Unit, DateTime.Now);
+			var data = new SensorData(sensorType, sensor.SensorName, value, sensor.Unit, date);
 			var serializedData = JsonSerializer.Serialize(data);
 			
 			var message = new MqttApplicationMessageBuilder()

@@ -14,7 +14,7 @@ internal class SensorConfiguration
 	public Double MaxValue { get; set; } = 0.0;
 	public Double MinValue { get; set; } = 0.0;
 	public Double Interval { get; set; } = 0.0;
-	public int InstanecesAmount { get; set; } = 0;				
+	public int InstancesAmount { get; set; } = 0;				
 }
 
 internal class SensorsConfigurationService

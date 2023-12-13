@@ -6,7 +6,7 @@
 			"MaxValue": 40,
 			"MinValue": 0,
 			"Interval": 10,
-			"InstanecesAmount": 10
+			"InstancesAmount": 4
 		},
 		{
 			"Type": "humidity",
@@ -14,7 +14,7 @@
 			"MaxValue": 100,
 			"MinValue": 0,
 			"Interval": 10,
-			"InstanecesAmount": 10
+			"InstancesAmount": 4
 		},
 		{
 			"Type": "pressure",
@@ -22,7 +22,7 @@
 			"MaxValue": 1050,
 			"MinValue": 950,
 			"Interval": 10,
-			"InstanecesAmount": 10
+			"InstancesAmount": 4
 		},
 		{
 			"Type": "CO2",
@@ -30,7 +30,7 @@
 			"MaxValue": 1000000,
 			"MinValue": 0,
 			"Interval": 10,
-			"InstanecesAmount": 10
+			"InstancesAmount": 4
 		}
 	]
 }

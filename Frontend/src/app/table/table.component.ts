@@ -32,28 +32,52 @@ export class TableComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   /* checkboxes */
-  sensorGroup: SensorGroupCheckBox[] = [{
-    name: 'Temperature',
+  sensorGroup: SensorGroupCheckBox[] = [
+  {
+    name: 'temperature',
     checked: true,
     color: 'accent',
     sensors: [
-      {name: 'T01', checked: true, color: 'primary'},
-      {name: 'T02', checked: true, color: 'primary'},
-      {name: 'T03', checked: true, color: 'primary'},
-      {name: 'T04', checked: true, color: 'primary'},
+      {name: 'T0', checked: true, color: 'primary'},
+      {name: 'T1', checked: true, color: 'primary'},
+      {name: 'T2', checked: true, color: 'primary'},
+      {name: 'T3', checked: true, color: 'primary'},
     ],
   },
     {
-      name: 'Pressure',
+      name: 'pressure',
       checked: true,
       color: 'accent',
       sensors: [
-        {name: 'P01', checked: true, color: 'primary'},
-        {name: 'P02', checked: true, color: 'primary'},
-        {name: 'P03', checked: true, color: 'primary'},
-        {name: 'P04', checked: true, color: 'primary'},
+        {name: 'P4', checked: true, color: 'primary'},
+        {name: 'P5', checked: true, color: 'primary'},
+        {name: 'P6', checked: true, color: 'primary'},
+        {name: 'P7', checked: true, color: 'primary'},
       ],
-    }];
+    },
+    {
+      name: 'CO2',
+      checked: true,
+      color: 'accent',
+      sensors: [
+        {name: 'C8', checked: true, color: 'primary'},
+        {name: 'C9', checked: true, color: 'primary'},
+        {name: 'C10', checked: true, color: 'primary'},
+        {name: 'C11', checked: true, color: 'primary'},
+      ],
+    },
+    {
+      name: 'humidity',
+      checked: true,
+      color: 'accent',
+      sensors: [
+        {name: 'H12', checked: true, color: 'primary'},
+        {name: 'H13', checked: true, color: 'primary'},
+        {name: 'H14', checked: true, color: 'primary'},
+        {name: 'H15', checked: true, color: 'primary'},
+      ],
+    }
+  ];
 
   allComplete: boolean[] = [true, true];
 
@@ -147,7 +171,11 @@ export class TableComponent implements AfterViewInit {
   }
 
   downloadCSV() {
-    // TODO AD: send request on /api/sensors/measurements-csv
+    // TODO
+    this.client.measurementsCsv(
+      this.filterRequest.from, this.filterRequest.to, this.filterRequest.sensorType,
+      this.filterRequest.sensorName, this.sortRequest.columnName, this.sortRequest.direction
+    ).subscribe(o => console.log(o));
   }
 
   private getCheckedSensorTypes() {

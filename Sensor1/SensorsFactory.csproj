@@ -11,4 +11,8 @@
     <PackageReference Include="MQTTnet" Version="4.3.1.873" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\sensors-config.json" />
+  </ItemGroup>
+
 </Project>
