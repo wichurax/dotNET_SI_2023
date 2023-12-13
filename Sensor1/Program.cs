@@ -12,6 +12,7 @@ public class Program
     {
 		GenericSensor newSensor = new("temperature");
 		Console.WriteLine($"{newSensor.SensorName} has started");
+		Console.WriteLine("Write value to send. You have to use , or . according to Your system settings");
 
 		Double value = Convert.ToDouble(Console.ReadLine());
 		String sensorType = newSensor.SensorType;
