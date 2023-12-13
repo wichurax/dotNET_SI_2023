@@ -19,7 +19,8 @@ internal class MessageBroker
 		var mqttFactory = new MqttFactory();
 		using var mqttClient = mqttFactory.CreateMqttClient();
 		var mqttClientOptions = new MqttClientOptionsBuilder()
-			.WithTcpServer("localhost", 1883)
+			//.WithTcpServer("localhost", 1883)
+			.WithTcpServer("host.docker.internal", 1883)
 			.Build();
 
 		// Setup message handling before connecting so that queued messages

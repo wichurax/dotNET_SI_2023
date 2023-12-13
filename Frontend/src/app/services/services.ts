@@ -10,20 +10,20 @@
 
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class Client {
-    private readonly API_BASE_URL = 'http://localhost:5207/api/sensors';
     private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient) {
-      this.http = http;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
     /**
@@ -36,7 +36,7 @@ export class Client {
      * @return Success
      */
     sensors(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<SensorMeasurementDto[]> {
-        let url_ = this.API_BASE_URL + "/measurements?";
+        let url_ = this.baseUrl + "/api/sensors?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)
@@ -72,11 +72,11 @@ export class Client {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSensors(response_);
+            return this.processMeasurements(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSensors(response_ as any);
+                    return this.processMeasurements(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<SensorMeasurementDto[]>;
                 }
@@ -85,7 +85,7 @@ export class Client {
         }));
     }
 
-    protected processSensors(response: HttpResponseBase): Observable<SensorMeasurementDto[]> {
+    protected processMeasurements(response: HttpResponseBase): Observable<SensorMeasurementDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -115,35 +115,64 @@ export class Client {
     }
 
     /**
+     * @param from (optional)
+     * @param to (optional)
+     * @param sensorType (optional)
+     * @param sensorName (optional)
+     * @param columnName (optional)
+     * @param direction (optional)
      * @return Success
      */
-    getWeatherForecast(): Observable<WeatherForecast[]> {
-        let url_ = this.API_BASE_URL + "/WeatherForecast";
+    measurementsCsv(from: Date | undefined, to: Date | undefined, sensorType: string[] | undefined, sensorName: string[] | undefined, columnName: string | undefined, direction: SortDirection | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/sensors/measurements-csv?";
+        if (from === null)
+            throw new Error("The parameter 'from' cannot be null.");
+        else if (from !== undefined)
+            url_ += "From=" + encodeURIComponent(from ? "" + from.toISOString() : "") + "&";
+        if (to === null)
+            throw new Error("The parameter 'to' cannot be null.");
+        else if (to !== undefined)
+            url_ += "To=" + encodeURIComponent(to ? "" + to.toISOString() : "") + "&";
+        if (sensorType === null)
+            throw new Error("The parameter 'sensorType' cannot be null.");
+        else if (sensorType !== undefined)
+            sensorType && sensorType.forEach(item => { url_ += "SensorType=" + encodeURIComponent("" + item) + "&"; });
+        if (sensorName === null)
+            throw new Error("The parameter 'sensorName' cannot be null.");
+        else if (sensorName !== undefined)
+            sensorName && sensorName.forEach(item => { url_ += "SensorName=" + encodeURIComponent("" + item) + "&"; });
+        if (columnName === null)
+            throw new Error("The parameter 'columnName' cannot be null.");
+        else if (columnName !== undefined)
+            url_ += "ColumnName=" + encodeURIComponent("" + columnName) + "&";
+        if (direction === null)
+            throw new Error("The parameter 'direction' cannot be null.");
+        else if (direction !== undefined)
+            url_ += "Direction=" + encodeURIComponent("" + direction) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "text/plain"
             })
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetWeatherForecast(response_);
+            return this.processMeasurementsCsv(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetWeatherForecast(response_ as any);
+                    return this.processMeasurementsCsv(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<WeatherForecast[]>;
+                    return _observableThrow(e) as any as Observable<void>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<WeatherForecast[]>;
+                return _observableThrow(response_) as any as Observable<void>;
         }));
     }
 
-    protected processGetWeatherForecast(response: HttpResponseBase): Observable<WeatherForecast[]> {
+    protected processMeasurementsCsv(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -152,17 +181,7 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(WeatherForecast.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return _observableOf(result200);
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -228,54 +247,6 @@ export interface ISensorMeasurementDto {
 export enum SortDirection {
     _0 = 0,
     _1 = 1,
-}
-
-export class WeatherForecast implements IWeatherForecast {
-    date?: Date;
-    temperatureC?: number;
-    readonly temperatureF?: number;
-    summary?: string | undefined;
-
-    constructor(data?: IWeatherForecast) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
-            this.temperatureC = _data["temperatureC"];
-            (<any>this).temperatureF = _data["temperatureF"];
-            this.summary = _data["summary"];
-        }
-    }
-
-    static fromJS(data: any): WeatherForecast {
-        data = typeof data === 'object' ? data : {};
-        let result = new WeatherForecast();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["temperatureC"] = this.temperatureC;
-        data["temperatureF"] = this.temperatureF;
-        data["summary"] = this.summary;
-        return data;
-    }
-}
-
-export interface IWeatherForecast {
-    date?: Date;
-    temperatureC?: number;
-    temperatureF?: number;
-    summary?: string | undefined;
 }
 
 export class ApiException extends Error {

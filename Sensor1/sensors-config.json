@@ -1,0 +1,36 @@
+﻿{
+	"SensorsList": [
+		{
+			"Type": "temperature",
+			"Unit": "C",
+			"MaxValue": 40,
+			"MinValue": 0,
+			"Interval": 10,
+			"InstanecesAmount": 10
+		},
+		{
+			"Type": "humidity",
+			"Unit": "%",
+			"MaxValue": 100,
+			"MinValue": 0,
+			"Interval": 10,
+			"InstanecesAmount": 10
+		},
+		{
+			"Type": "pressure",
+			"Unit": "hPa",
+			"MaxValue": 1050,
+			"MinValue": 950,
+			"Interval": 10,
+			"InstanecesAmount": 10
+		},
+		{
+			"Type": "CO2",
+			"Unit": "ppm",
+			"MaxValue": 1000000,
+			"MinValue": 0,
+			"Interval": 10,
+			"InstanecesAmount": 10
+		}
+	]
+}

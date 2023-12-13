@@ -1,43 +1,67 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Text.Json;
+﻿using System.Text.Json;
+using Configuration;
+using GenericSensorNamespace;
 using MQTTnet;
-using Sensor1;
 using SensorsFactory;
 
-// TODO MS
+public class Program
+{
+	static MessagePublisher publisher = new MessagePublisher();
+	static SensorsConfiguration _configuration = null!;
+    static async Task Main()
+    {
+		Random rand = new Random();
+		List<GenericSensor> sensors = new List<GenericSensor>();
+		_configuration = SensorsConfigurationService.Get();
 
-// potrzebuję żeby argumenty, które przyjmuje ta aplikacja konsolowa pozwalały na uruchomienie wielu instancji czujników
-// najlepiej aby uruchomiona bez parametrów odpalała 16 instncji (4x4)
-// częstotliwość wysyłki danych powinna być określona w konfiguracji (appsettings.json)
-// możliwość uruchomienia wybranej ilośći instancji wybranego typu czujnika z wybraną częstotliwościa
+		int temperatureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "temperature").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
+		int pressureSensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "pressure").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
+		int co2SensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "CO2").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
+		int humiditySensorsAmount = _configuration.SensorsList.Where(sensor => sensor.Type == "humidity").Select(sensor => sensor.InstanecesAmount).FirstOrDefault();
 
-// przykłady komend
+		for(int i = 0; i < temperatureSensorsAmount; i++){
+			GenericSensor newSensor = new("temperature");
+			sensors.Add(newSensor);
+		}
+		for(int i = 0; i < pressureSensorsAmount; i++){
+			GenericSensor newSensor = new("pressure");
+			sensors.Add(newSensor);
+		}
+		for(int i = 0; i < co2SensorsAmount; i++){
+			GenericSensor newSensor = new("CO2");
+			sensors.Add(newSensor);
+		}
+		for(int i = 0; i < humiditySensorsAmount; i++){
+			GenericSensor newSensor = new("humidity");
+			sensors.Add(newSensor);
+		}
 
-// * SensorsFactory.exe
-// program uruchamia się z domyślnymi parametrami
 
-// * SensorsFactory.exe -t --instances 7 --interval 10
-// -t oznacza temteraturę
-// --instances 7 oznacza, że 7 instancji się ma uruchomić
-// --interval 10 oznacza, że co 10 sekund ma być wysyłana nowa wartość 
-// kolejne instancje uruchamiają się z opóźnieniem wg ciągu fibonacciego
-
-
-var publisher = new MessagePublisher();
-
-for (int j = 1; j < 5; j++) {
-	for (int i = 0; i < 5; i++)
-	{
-		var temperatureValue = TemperatureSensor.GenereteNextValue();
-		var data = new SensorData("Temperature", "T0" + j, temperatureValue, "Celsius", DateTimeOffset.Now);
-		var serializedData = JsonSerializer.Serialize(data);
-		
-		var message = new MqttApplicationMessageBuilder()
-			.WithTopic("sensors/temperature")
-			.WithPayload(serializedData)
-			.Build();
-
-		await publisher.Publish(message);
+        foreach (GenericSensor sensor in sensors){
+			SendDataAsync(sensor);
+			Console.WriteLine($"{sensor.SensorName} has started");
+			var delay = sensor.Interval * rand.NextDouble() * 1000;
+			await Task.Delay((int)delay);
+		}
+		Console.ReadKey();
 	}
+
+    static async Task SendDataAsync(GenericSensor sensor)
+    {
+		while(true){
+			Double value = sensor.GenereteNextValue();
+			String sensorType = sensor.SensorType;
+
+			var data = new SensorData(sensorType, sensor.SensorName, value, sensor.Unit, DateTime.Now);
+			var serializedData = JsonSerializer.Serialize(data);
+			
+			var message = new MqttApplicationMessageBuilder()
+				.WithTopic("sensors/" + sensorType)
+				.WithPayload(serializedData)
+				.Build();
+						
+			await publisher.Publish(message);
+			await Task.Delay((int)sensor.Interval*1000);
+		}
+    }
 }
