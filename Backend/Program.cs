@@ -31,9 +31,13 @@ await Task.Factory.StartNew(async () =>
 				Console.WriteLine(ex);
 
 				isConnected = false;
-				await Task.Delay(5000);
 			}
 		}
+
+		if (isConnected) 
+			Console.Read();
+		else 
+			await Task.Delay(5000);
 
 		Console.WriteLine("MessageBroker finished it's work");
 	}

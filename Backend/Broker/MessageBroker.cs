@@ -62,7 +62,12 @@ internal class MessageBroker
 			.ToList()
 			.ForEach(log => Console.WriteLine(log));
 
-		Console.Read();
+		var ct = new CancellationTokenSource();
+
+		while (!ct.IsCancellationRequested)
+		{
+			await Task.Delay(10);
+		}
 	}
 }
 
