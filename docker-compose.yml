@@ -11,9 +11,17 @@ services:
     ports:
       - "27017:27017"
 
+  frontend:
+    image: si_frontend
+    build: ./Frontend      
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./Frontend:/usr/src/app
+
   backend:
-    build:
-      context: ./Backend
+    image: si_backend
+    build: ./Backend
     ports:
       - "32769:80"
     extra_hosts:
@@ -21,11 +29,3 @@ services:
     depends_on:
       - hivemq
       - mongodb
-
-  frontend:
-    build:
-      context: ./Frontend
-    ports:
-      - "4200:4200"
-    volumes:
-      - ./Frontend:/usr/src/app

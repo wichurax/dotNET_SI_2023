@@ -8,8 +8,8 @@ public class Program
 {
 	static MessagePublisher publisher = new MessagePublisher();
 	static SensorsConfiguration _configuration = null!;
-	static DateTime _startDate = new DateTime(2023, 12, 1);
-	static DateTime _endDate = new DateTime(2023, 12, 13);
+	static readonly DateTime _startDate = new(2023, 12, 13);
+	static readonly DateTime _endDate = new(2023, 12, 16);
 	
     static async Task Main()
     {
@@ -53,19 +53,21 @@ public class Program
     {
 	    for (DateTime date = _startDate; date <= _endDate; date = date.AddDays(1))
 	    {
-			Double value = sensor.GenereteNextValue();
-			String sensorType = sensor.SensorType;
+			var value = sensor.GenereteNextValue();
+			var sensorType = sensor.SensorType;
 
 			var data = new SensorData(sensorType, sensor.SensorName, value, sensor.Unit, date);
 			var serializedData = JsonSerializer.Serialize(data);
-			
+
+			var topic = $"sensors/{sensorType}";
+
 			var message = new MqttApplicationMessageBuilder()
-				.WithTopic("sensors/" + sensorType)
+				.WithTopic(topic)
 				.WithPayload(serializedData)
 				.Build();
 						
 			await publisher.Publish(message);
 			await Task.Delay((int)sensor.Interval*1000);
 		}
-    }
+	}
 }

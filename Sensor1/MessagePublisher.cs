@@ -7,7 +7,6 @@ namespace SensorsFactory
 	{
 		public async Task Publish(MqttApplicationMessage message)
 		{
-
 			try
 			{
 				var factory = new MqttFactory();
