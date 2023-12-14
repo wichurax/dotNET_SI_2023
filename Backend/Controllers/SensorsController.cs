@@ -2,6 +2,7 @@
 using Backend.Persistence.Entities;
 using Backend.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ServiceStack;
 using System.Text;
 
@@ -21,6 +22,10 @@ public class SensorsController : ControllerBase
 	[HttpGet("measurements")]
 	public ActionResult<List<SensorMeasurementDto>> GetMeasurements([FromQuery] FilterDto filter, [FromQuery] SortDto sort)
 	{
+		Console.WriteLine("---------- ENDPOINT HIT ----------");
+		Console.WriteLine($"filter: {JsonConvert.SerializeObject(filter)}");
+		Console.WriteLine($"sort: {JsonConvert.SerializeObject(sort)})");
+
 		var result = _repository
 			.Get(filter, sort)
 			.Select(x => x.ToDto())

@@ -8,7 +8,6 @@ namespace Backend.Broker;
 internal class MessageBroker
 {
 	private readonly MongoDbService _mongoDbService;
-	private bool _isConnection = false;
 
 	public MessageBroker(MongoDbService mongoDbService)
 	{
@@ -49,44 +48,28 @@ internal class MessageBroker
 			return Task.CompletedTask;
 		};
 
-		while (!_isConnection)
-		{
-			try
-			{
-				await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+		await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
 
-				var mqttSubscribeOptions = mqttFactory
-					.CreateSubscribeOptionsBuilder()
-					.FilterToTopics(topics)
-					.Build();
+		var mqttSubscribeOptions = mqttFactory
+			.CreateSubscribeOptionsBuilder()
+			.FilterToTopics(topics)
+			.Build();
 
-				await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
+		await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
 
-				topics
-					.Select(topic => $"Subscribed to topic: {topic}")
-					.ToList()
-					.ForEach(log => Console.WriteLine(log));
+		topics
+			.Select(topic => $"Subscribed to topic: {topic}")
+			.ToList()
+			.ForEach(log => Console.WriteLine(log));
 
-				_isConnection = true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				_isConnection = false;
-			}
-
-			if (_isConnection) 
-				Console.ReadKey();
-			
-			await Task.Delay(3000);
-		}			
+		Console.Read();
 	}
 }
 
 internal static class MessageBrokerExtensions
 {
 	public static MqttClientSubscribeOptionsBuilder FilterToTopics(
-		this MqttClientSubscribeOptionsBuilder subscriptionBuilder, 
+		this MqttClientSubscribeOptionsBuilder subscriptionBuilder,
 		List<string> topics)
 	{
 		foreach (var topic in topics)
