@@ -1,12 +1,8 @@
 FROM node:latest
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
+WORKDIR /app
 COPY . .
+RUN npm install
+RUN npm install -g @angular/cli
 
 EXPOSE 4200
 
