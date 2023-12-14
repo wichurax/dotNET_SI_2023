@@ -1,29 +1,30 @@
 version: '3'
 services:
-  mqtt-broker:
+  hivemq:
     image: hivemq/hivemq4
     ports:
       - "1883:1883"
       - "8080:8080"
-
-# TODO AD
-#  backend:
-#    image: your-aspnet-image
-#    depends_on:
-#      - mqtt-broker
-#      - mongodb
-#    networks:
-#      - app-network
 
   mongodb:
     image: mongo
     ports:
       - "27017:27017"
 
+  backend:
+    build:
+      context: ./Backend
+    ports:
+      - "32769:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - hivemq
+      - mongodb
+
   frontend:
     build:
       context: ./Frontend
-      dockerfile: Dockerfile
     ports:
       - "4200:4200"
     volumes:
