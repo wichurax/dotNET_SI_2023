@@ -8,8 +8,8 @@ public class Program
 {
 	static MessagePublisher publisher = new MessagePublisher();
 	static SensorsConfiguration _configuration = null!;
-	static readonly DateTime _startDate = new(2023, 12, 13);
-	static readonly DateTime _endDate = new(2023, 12, 16);
+	static readonly DateTimeOffset _startDate = new(new DateTime(2023, 12, 1));
+	static readonly DateTimeOffset _endDate = new(new DateTime(2023, 12, 14));
 	
     static async Task Main()
     {
@@ -51,7 +51,8 @@ public class Program
 
     static async Task SendDataAsync(GenericSensor sensor)
     {
-	    for (DateTime date = _startDate; date <= _endDate; date = date.AddDays(1))
+		var rand = new Random();
+	    for (var date = _startDate; date <= _endDate; date = date.AddDays(1))
 	    {
 			var value = sensor.GenereteNextValue();
 			var sensorType = sensor.SensorType;

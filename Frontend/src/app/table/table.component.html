@@ -65,7 +65,7 @@
 
     <ng-container matColumnDef="MeasurementDate">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Date </mat-header-cell>
-      <mat-cell *matCellDef="let measurement"> {{measurement.measurementDate | date }} </mat-cell>
+      <mat-cell *matCellDef="let measurement"> {{measurement.measurementDate | date:'medium' }} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
